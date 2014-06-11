@@ -39,16 +39,17 @@ elFinder.prototype.commands.edit = function() {
 				ta   = $('<textarea class="elfinder-file-edit" rows="20" id="'+id+'-ta">'+fm.escape(content)+'</textarea>'),
 				save = function() {
 					ta.editor && ta.editor.save(ta[0], ta.editor.instance);
-					dfrd.resolve(ta.getContent());
-					ta.elfinderdialog('close');
+					dfrd.notify(ta.getContent()); // notify a save request
+//					ta.elfinderdialog('close');
 				},
-				cancel = function() {
+				close = function() {
 					dfrd.reject();
 					ta.elfinderdialog('close');
 				},
 				opts = {
 					title   : file.name,
 					width   : self.options.dialogWidth || 450,
+					height  : self.options.dialogHeight || 450,
 					buttons : {},
 					close   : function() { 
 						ta.editor && ta.editor.close(ta[0], ta.editor.instance);
@@ -104,7 +105,7 @@ elFinder.prototype.commands.edit = function() {
 							// close on ctrl+w/q
 							if (code == 81 || code == 87) {
 								e.preventDefault();
-								cancel();
+								close();
 							}
 							if (code == 83) {
 								e.preventDefault();
@@ -116,7 +117,7 @@ elFinder.prototype.commands.edit = function() {
 				}
 				
 				opts.buttons[fm.i18n('Save')]   = save;
-				opts.buttons[fm.i18n('Cancel')] = cancel
+				opts.buttons[fm.i18n('Close')] = close
 				
 				fm.dialog(ta, opts).attr('id', id);
 				return dfrd.promise();
@@ -158,7 +159,14 @@ elFinder.prototype.commands.edit = function() {
 			})
 			.done(function(data) {
 				dialog(id, file, data.content)
-					.done(function(content) {
+					.then(function(data) {
+							// Edition is completed
+							dfrd.resolve(data);
+						},function(error) {
+							// Edition failed
+							dfrd.reject(error);
+						},function(content) {
+						// Edition is on-going, saving file
 						fm.request({
 							options : {type : 'post'},
 							data : {
@@ -176,7 +184,7 @@ elFinder.prototype.commands.edit = function() {
 							data.changed && data.changed.length && fm.change(data);
 							dfrd.resolve(data);
 						});
-					})
+					});
 			})
 			.fail(function(error) {
 				dfrd.reject(error);
