@@ -148,17 +148,16 @@ $.fn.elfinderdialog = function(opts) {
 				}
 			})
 		}
-		dialog.prepend(
-			$('<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">'+opts.title+'</div>')
-				.prepend($('<a href="#" class="ui-dialog-titlebar-close ui-corner-all"><span class="ui-icon ui-icon-closethick"/></a>')
-					.mousedown(function(e) {
-						e.preventDefault();
-						self.elfinderdialog('close');
-					}))
-
-		);
-			
-		
+		if (opts.title) {
+			dialog.prepend($('<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix">'+opts.title+'</div>'));
+        }
+		if (opts.addCloseThickbox) {
+			dialog.prepend($('<a href="#" class="ui-dialog-titlebar-close ui-corner-all"><span class="ui-icon ui-icon-closethick"/></a>')
+						.mousedown(function(e) {
+							e.preventDefault();
+							self.elfinderdialog('close');
+						}));
+        }
 			
 		$.each(opts.buttons, function(name, cb) {
 			var button = $('<button type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only"><span class="ui-button-text">'+name+'</span></button>')
@@ -204,6 +203,7 @@ $.fn.elfinderdialog.defaults = {
 	resizable : true,
 	autoOpen  : true,
 	closeOnEscape : true,
+	addCloseThickbox : true,
 	destroyOnClose : false,
 	buttons   : {},
 	position  : null,

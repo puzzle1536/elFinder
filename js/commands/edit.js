@@ -50,6 +50,7 @@ elFinder.prototype.commands.edit = function() {
 					title   : file.name,
 					width   : self.options.dialogWidth || 450,
 					height  : self.options.dialogHeight || 450,
+					addCloseThickbox : true,
 					buttons : {},
 					close   : function() { 
 						ta.editor && ta.editor.close(ta[0], ta.editor.instance);
